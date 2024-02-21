@@ -1,0 +1,364 @@
+----------------------------------------------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\soulu\OneDrive - University of Toronto\University of Toronto\UTM 2021-2023\7_2023 Fall\ECO375H5F\Homework\Homework
+>  3\Homework_3.log
+  log type:  text
+ opened on:   4 Dec 2023, 17:10:46
+
+. ********************************************************************************
+
+. 
+. **************** ECO375 Homework 3 (Cheong Siu Lun, Chris) *********************
+
+. 
+. ********************************************************************************
+
+. 
+. 
+. 
+. *　Setting up Working Directory
+
+. 
+. 
+. 
+. cd "C:\Users\soulu\OneDrive - University of Toronto\University of Toronto\UTM 2021-2023\7_2023 Fall\ECO375H5F\Homework\Homework 3"
+C:\Users\soulu\OneDrive - University of Toronto\University of Toronto\UTM 2021-2023\7_2023 Fall\ECO375H5F\Homework\Homework 3
+
+. 
+. 
+. 
+. 
+. 
+. *****************************
+
+. 
+. // Question 4: Monte Carlo Simulation
+
+. 
+. *****************************
+
+. 
+. * Define the program hwprog
+
+. 
+. clear all
+
+. 
+. set seed 123
+
+. 
+. cap program drop hwprog
+
+. 
+. program hwprog, rclass
+  1. 
+. drop _all
+  2. 
+. set obs 100
+  3. 
+. gen u = rnormal(0,1)
+  4. 
+. gen v = rnormal(0,1)
+  5. 
+. gen p = rnormal(0,1)
+  6. 
+. gen z = rnormal(0,1)
+  7. 
+. gen x = 3 - z + p + v
+  8. 
+. gen y1 = 1 + 2*x + 0.2*p + (2.2 - 0.2)*u   
+  9. 
+. gen y2 = 1 + 2*x + 2*p + (2.2 - 2)*u       
+ 10. 
+. foreach samplesize in 10 30 100 {
+ 11. 
+. reg y1 x if _n <= `samplesize'
+ 12. 
+. return scalar b11_`samplesize' = _b[x] 
+ 13. 
+. reg y2 x if _n <= `samplesize'
+ 14. 
+. return scalar b12_`samplesize' = _b[x] 
+ 15. 
+. ivregress 2sls y1 (x = z) if _n <= `samplesize'
+ 16. 
+. return scalar i11_`samplesize' = _b[x] 
+ 17. 
+. ivregress 2sls y2 (x = z) if _n <= `samplesize'
+ 18. 
+. return scalar i12_`samplesize' = _b[x] 
+ 19. 
+. }
+ 20. 
+. end
+
+. 
+. 
+. 
+. simulate "hwprog" b11_10=r(b11_10) b11_30=r(b11_30) b11_100=r(b11_100) b12_10=r(b12_10) b12_30=r(b12_30) b12_100=r(b12_100) i11_10=r(i
+> 11_10) i11_30=r(i11_30) i11_100=r(i11_100) i12_10=r(i12_10) i12_30=r(i12_30) i12_100=r(i12_100), reps(1000)
+
+Command:      hwprog
+Statistics:   b11_10     = r(b11_10)
+              b11_30     = r(b11_30)
+              b11_100    = r(b11_100)
+              b12_10     = r(b12_10)
+              b12_30     = r(b12_30)
+              b12_100    = r(b12_100)
+              i11_10     = r(i11_10)
+              i11_30     = r(i11_30)
+              i11_100    = r(i11_100)
+              i12_10     = r(i12_10)
+              i12_30     = r(i12_30)
+              i12_100    = r(i12_100)
+
+. 
+. 
+. 
+. 
+. 
+. * (c) Using the results of your simulation, complete the table below four times: showing the average and standard deviation of the est
+> imators of β1, from using OLS and from using IV.
+
+. 
+. 
+. 
+. ** For reg y1 x (δ = 0.2)
+
+. 
+. sum(b11_10)
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+      b11_10 |      1,000    2.095685    .4163418   .6173667   3.661165
+
+. 
+. sum(b11_30)
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+      b11_30 |      1,000    2.069023    .2196557   1.194952   2.792497
+
+. 
+. sum(b11_100)
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+     b11_100 |      1,000     2.07162    .1195553   1.685212   2.458927
+
+. 
+. 
+. 
+. ** For reg y2 x (δ = 2)
+
+. 
+. sum(b12_10)
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+      b12_10 |      1,000    2.673549    .3483987   1.415651   4.232797
+
+. 
+. sum(b12_30)
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+      b12_30 |      1,000    2.664682    .1826485   2.045135   3.187453
+
+. 
+. sum(b12_100)
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+     b12_100 |      1,000    2.668769    .0941741   2.387362   2.977501
+
+. 
+. 
+. 
+. ** For ivregress y1 x (δ = 0.2)
+
+. 
+. sum(i11_10)
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+      i11_10 |      1,000     3.01528    38.23021  -205.6248   1191.128
+
+. 
+. sum(i11_30)
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+      i11_30 |      1,000    1.972263    .4687721  -2.132018   3.962026
+
+. 
+. sum(i11_100)
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+     i11_100 |      1,000    2.002804    .2149866   1.201913   2.763691
+
+. 
+. 
+. 
+. ** For ivregress y2 x (δ = 2)
+
+. 
+. sum(i12_10)
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+      i12_10 |      1,000    2.597668    18.30144  -21.12239   562.7689
+
+. 
+. sum(i12_30)
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+      i12_30 |      1,000    1.927653    .5033011  -3.447257   2.931617
+
+. 
+. sum(i12_100)
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+     i12_100 |      1,000    1.987746     .211928   .3280598   2.509643
+
+. 
+. 
+. 
+. 
+. 
+. * (d) Using the results above, create one more table with the difference, MSE(β_hat OLS) - MSE(β_hat IV). That is, find the MSE of eac
+> h estimator, and fill the table with the difference. Note that positive values shows situations where IV is preferred, while negative 
+> values shows when OLS is preferred.
+
+. 
+. 
+. 
+. ** Find the MSE for OLS and IV Estimators in Each Sample Size {10, 30, 100}
+
+. 
+. 
+. 
+. ** (1) samplesize = 10
+
+. 
+. ** y = y1 (δ = 0.2)
+
+. 
+. egen OLSMSE1_10 = mean((b11_10 - 2)^2)
+
+. 
+. egen IVMSE1_10 = mean((i11_10 - 2)^2)
+
+. 
+. gen diff1_10 = OLSMSE1_10 - IVMSE1_10
+
+. 
+. di diff1_10
+-1460.9362
+
+. 
+. 
+. 
+. ** y = y2 (δ = 2)
+
+. 
+. egen OLSMSE2_10 = mean((b12_10 - 2)^2)
+
+. 
+. egen IVMSE2_10 = mean((i12_10 - 2)^2)
+
+. 
+. gen diff2_10 = OLSMSE2_10 - IVMSE2_10
+
+. 
+. di diff2_10
+-334.38995
+
+. 
+. 
+. 
+. ** (2) samplesize = 30
+
+. 
+. ** y = y1 (δ = 0.2)
+
+. 
+. egen OLSMSE1_30 = mean((b11_30 - 2)^2)
+
+. 
+. egen IVMSE1_30 = mean((i11_30 - 2)^2)
+
+. 
+. gen diff1_30 = OLSMSE1_30 - IVMSE1_30
+
+. 
+. di diff1_30
+-.16733226
+
+. 
+. 
+. 
+. ** y = y2 (δ = 2) 
+
+. 
+. egen OLSMSE2_30 = mean((b12_30 - 2)^2)
+
+. 
+. egen IVMSE2_30 = mean((i12_30 - 2)^2)
+
+. 
+. gen diff2_30 = OLSMSE2_30 - IVMSE2_30
+
+. 
+. di diff2_30
+.21683717
+
+. 
+. 
+. 
+. ** (3) samplesize = 100
+
+. 
+. ** y = y1 (δ = 0.2)
+
+. 
+. egen OLSMSE1_100 = mean((b11_100 - 2)^2)
+
+. 
+. egen IVMSE1_100 = mean((i11_100 - 2)^2)
+
+. 
+. gen diff1_100 = OLSMSE1_100 - IVMSE1_100
+
+. 
+. di diff1_100
+-.02677224
+
+. 
+. 
+. 
+. ** y = y2 (δ = 2)
+
+. 
+. egen OLSMSE2_100 = mean((b12_100 - 2)^2)
+
+. 
+. egen IVMSE2_100 = mean((i12_100 - 2)^2)
+
+. 
+. gen diff2_100 = OLSMSE2_100 - IVMSE2_100
+
+. 
+. di diff2_100
+.41109324
+
+. log close
+      name:  <unnamed>
+       log:  C:\Users\soulu\OneDrive - University of Toronto\University of Toronto\UTM 2021-2023\7_2023 Fall\ECO375H5F\Homework\Homework
+>  3\Homework_3.log
+  log type:  text
+ closed on:   4 Dec 2023, 17:14:08
+----------------------------------------------------------------------------------------------------------------------------------------
